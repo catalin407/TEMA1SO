@@ -2,35 +2,37 @@
 
 int main(int argc, char **argv)
 {	
-	person tmp;
+	hashmap *tmp1;
+	hashmap **hash_map;
 	char *ext;
 	char *flag;
 	char *readInput;
 	char *pch;
+	char *pch1;
 	int i;
-	int outIndex;
-	int inIndex;
 	FILE *fIn;
 	FILE *fOut;
-	boolean goodExt; 
-	boolean goodParam;
+	FILE *fErr;
 	boolean inputFileExt;
 	boolean outputFileExt;
 	boolean noCode;
 
-	outIndex = -1;
-	inIndex = -1;
-	goodExt = T;
-	goodParam = T;
 	outputFileExt = F;
 	noCode = T;
 	inputFileExt = T;
 	readInput = (char *)malloc(255 * sizeof(char));
-	hash_table = (person **)malloc(sizeof(person *) * TABLE_SIZE);
+	hash_map = init_hash_table();
+	tmp1 = (hashmap *)malloc(sizeof(hashmap));
+	fOut = NULL;
+	fIn = NULL;
+	fErr = NULL;
 	init_hash_table();
 
 	if (readInput == NULL)
-		return 1;
+		exit(12);
+
+	if (hash_map == NULL)
+		exit(12);
 
 	if (argc == 1) {
 		fgets(readInput, 255, stdin);
@@ -38,61 +40,58 @@ int main(int argc, char **argv)
 	}
 
 	if (argc > 1) {
-		for (i = 1; i < argc; i++)
-			if (verf_file_ext(argv[i]) == 1)
-				return 1;
+		for (i = 1; i < argc; i++) {
+			if (verf_file_ext(argv[i], i) == i + 1) {
+				fIn = fopen(argv[i], "r");
+
+				if (fIn == NULL)
+					exit(12);
+
+				inputFileExt = T;
+			} else if (verf_file_ext(argv[i], i) == i + 2) {
+				fOut = fopen(argv[i], "w+");
+
+				if (fOut == NULL)
+					exit(12);
+
+				outputFileExt = T;
+			} else if (verf_file_ext(argv[i], i) == i + 5)
+					exit(12);
+		}
 
 		for (i = 1; i < argc; i++)
-			if (verf_param(argv[i]) == 1)
-				return 1;
-
-		if (goodExt == T && goodParam == T) {
-
-			for (i = 0; i < argc; i++) {
-				ext = strrchr(argv[i], '.');
-
-				if (strcmp("in", ext + 1) == 0) {
-					inputFileExt = T;
-					inIndex = i;
-				} else 
-					if (strcmp("out", ext + 1) == 0) {
-						outputFileExt = T;
-						outIndex = i;
-					}
+			if (verf_param(argv[i], i) == i) {
+				pch1 = strtok(argv[i+1], "=");
+				tmp1->name = 
+					(char *)malloc((strlen(pch1) + 1) * 
+					sizeof(char));
+				strcpy(tmp1->name, pch1);
+				pch1 = strtok(NULL, "=");
+				tmp1->value = 
+					(char *)malloc((strlen(pch1) + 1) * 
+					sizeof(char));
+				strcpy(tmp1->value, pch1);
+				hash_table_insert(hash_map, 
+					tmp1->name, 
+					tmp1->value);
 			}
 
-			if (inputFileExt == T && outputFileExt == F) {
-				fIn = fopen(argv[inIndex], "r");
-				while (fgets(readInput, 255, fIn) != NULL) {
-					if (strstr(readInput, "#") == NULL &&
-						noCode == T) {
-						fprintf(stdout, "%s", readInput);
-					} else { 
-						noCode = F;
-						pch = strtok(readInput, "");
-					while (pch != NULL) {
-						add_define_hash(pch, &tmp);
-						pch = strtok(NULL, "");
-					}
-
-					}
+		if (inputFileExt == T && outputFileExt == F) {
+			while (fgets(readInput, 255, fIn) != NULL) {
+				pch = strtok(readInput, "");
+				while (pch != NULL) {;
+					add_define_hash(pch, hash_map, &fIn);
+					pch = strtok(NULL, "");
 				}
-
-				fclose(fIn);
-			} else 
-				if (inputFileExt == T && outputFileExt == T) {
-					fIn = fopen(argv[inIndex], "r");
-					fOut = fopen(argv[outIndex], "w");
-					fgets(readInput, 255, fIn);
-					fprintf(fOut, "%s", readInput);
-					fclose(fIn);
-					fclose(fOut);
-				}
+			}
+		} else if (inputFileExt == T && outputFileExt == T) {
+			fgets(readInput, 255, fIn);
+			fprintf(fOut, "%s", readInput);
 		}
 	}
-	hash_table_delete();
+	/*print_table(hash_map);*/
+	hash_table_delete(hash_map, TABLE_SIZE);
 	free(readInput);
-	free(*hash_table);
 
 	return 0;
 }
