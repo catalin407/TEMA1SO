@@ -1,34 +1,30 @@
-# ***C Preprocessor***
+# ***Tema 1 Multi-platform Development***
 
 ## *Organizare*
 
-Am folosit un '_hashmap_', un struct ce are ca atribute:
+Am implementat o structura de tip '_hashmap_', ce are ca atribute:
  - char *name
  - char *value
 
-Luand drept exemplu linia
+M-am ghidat dupa exemplul urmator
 
 ```
- #define VAR0 10 + 2
+ #define VAR0 1
 ```
 
-In acest caz *name* ar fi *VAR0* (symbol), iar *value* ar fi *"10 + 2"* (mapping)
+Unde *name* ar fi *VAR0* (symbol), iar *value* ar fi *1* (mapping)
 
 ### *Idee generala*
 
-Programul functioneaza in urmatorul fel: 
+Programul functioneaza-ish in felul urmator: 
 
 0. Se citesc parametrii din linia de comanda, adica: 
-    - fisierul de input .in din care se face citirea, daca acesta este omis, se face citire din stdin
-    - fisierul de output in care se scrie, daca este omis, se face scriere la stdout
-    - "pre"definiri de tipul KEY=VALUE
-    - path-ul care directoare in care se afla headere
-  1. Se citeste linie cu linie din fisier. In cadrul liniei sunt procesate/prelucrate cuvintele, astfel incat linia initiala se modifica, la nevoie.
-  2. Din linia citita verificam cu _strstr_ daca avem o directiva de preprocesare (*#define*, *#if* etc), daca nu, atunci scriem linia respectiva, daca da, vedem care tip de directiva este folosind _strstr_ iar, pentru ce sti ce logica ar trebui folosita
-  3. V1: Daca nu este citita o directiva, se apeleaza o functie de _find_and_replace_, care gaseste string-uri ce exista in hashmap, caz in care le inlocuieste, facand un nou string. Este luat in calcul si cazul in care nu ar trebui sa fie afisat/inlocuit (cand key-ul se afla intre " ", caz in care ar trebui sa fie considerat string)
-  4. V2: Daca este citita o directiva, atunci se merge pe o logica specifica directivei. De mentionat este existenta unei auxiliare _static int canWrite_, care precizeaza state-ul in cazul directivelor conditionale
-  
-  > Side note: pentru #include se repeta pasii de mai sus pe noul fisier ce ar trebui inclus
+    - fisierul de input .in din care se face citirea, daca acesta nu exista citirea se va face din stdin
+    - fisierul de output in care se scrie, daca acesta nu exista afisarea se va face in stdout
+    - "pre"definiri in cazul flagului *-D*
+  1. Se citeste linie cu linie din fisier. In cadrul liniei sunt prelucrate cuvintele, iar linia se modifica, daca este cazul.
+  2. Linia citita este verificata cu _strstr_ daca avem o directiva de preprocesare (*#define*, *#if* etc), daca nu, atunci scriem linia respectiva, daca da, verificam de tip de directiva este cu _strstr_ si aplicam logica corespunzatoare fiecareia
+  3. In cadrul functie _add_define_hash_ se petrece toata logica de preprocesare, aici verific ce tip de logica trebuie folosita. Se parcurge fiecare linie citita si se verifica daca exista un _symbol_ din _hashmap_ in acea linie si il inlocuieste cu _value_ din _hashmap_
 
   ## *How to use*
 
@@ -40,34 +36,38 @@ Se foloseste make. Acesta va face compilarea si link-editarea fisierelor so-cpp.
 $ make
 $ ./so
 SAU
-$ ./so -D VAR0=10 <input_file_path> <input_file_path>
+$ ./so -D VAR0=1 <path_of_file> <path_of_file>
 ```
 
 ### *Windows*
 
-Se foloseste nmake. Similar cu varianta Linux, doar ca aici executabilul va fi de forma so-cpp.exe.
+Se foloseste nmake. Foarte similar cu varianta Linux, doar ca in acest caz executabilul va fi de forma so-cpp.exe.
 ```
 > nmake
 > ./so-cpp.exe
 SAU
-> ./so.exe -D VAR0=10 <input_file_path> <input_file_path>
+> ./so.exe -D VAR0=1 <path_of_file> <path_of_file>
 ```
 ## Utilitate
 
-Tema mi s-a parut utila, chit ca destul de muncitoreasca. Am inteles mai bine lucrul cu string-uri, dar in special ca am lucrat cu valgrind si am putut sa vad mult mai usor de unde apar memory leaks sau alte posibile erori. In schimb checker-ul pentru coding style nu mi s-a parut prea friendly, unele 'idei' pe care le dadea nu pareau atat de utile.
+Tema mi s-a parut utila, dar doar pentru o aprofundare/reamintire in ceea ce priveste lucrul cu _char*_. Cand vine vorba de checker, pot spune ca nu este cel mai formidabil, mai ales partea de coding-style, ce mi se pare mult prea restrictiv, mai ales ca in atatia ani toata lumea si-a format un coding-style ce sigur s-ar fi incadrat in standarde fara acele teste de coding-style ce mai mult iti te incurca, de multe ori dand sfaturi inutile. 
 
 ## Performanta?
 
-Nu cred ca implementarea este cea mai buna (nici chiar naiva), sunt sigur ca ar fi loc de mai bine, in special la lucrul cu #include
+Performanta nu este una formidabila, mai ales ca nu sunt implementare toate directivele.
 ## Git repository
-[SO-assignments/Tema1](https://github.com/VilciuRazvan/SO-assignments)
+[TEMA1SO](https://github.com/catalin407/TEMA1SO)
 
 ## Bibliografie
 
 https://www.tutorialspoint.com/data_structures_algorithms/hash_table_program_in_c.htm
+
+https://www.youtube.com/watch?v=2Ti5yvumFTU
 
 https://www.tutorialspoint.com/c_standard_library/c_function_strstr.htm
 
 https://www.tutorialspoint.com/c_standard_library/c_function_strchr.htm
 
 https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
+
+https://stackoverflow.com/
