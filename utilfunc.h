@@ -24,7 +24,7 @@ int verf_file_ext(char *str, int index);
 int verf_param(char *str, int index);
 char *replaceWord(const char *s, const char *oldW, const char *newW);
 void add_define_hash(char *str, hashmap **hash_table, FILE **f);
-char *read_from_file(FILE **f, char *read);
+char *read_from_file(FILE **f);
 int test_if_cond(char *str);
 int test_if_def(char *str, hashmap **hash_table);
 

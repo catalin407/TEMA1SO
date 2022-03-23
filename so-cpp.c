@@ -22,6 +22,7 @@ int main(int argc, char **argv)
 	inputFileExt = T;
 	readInput = (char *)malloc(255 * sizeof(char));
 	hash_map = init_hash_table();
+	tmp1 = NULL;
 	tmp1 = (hashmap *)malloc(sizeof(hashmap));
 	fOut = NULL;
 	fIn = NULL;
@@ -32,6 +33,9 @@ int main(int argc, char **argv)
 		exit(12);
 
 	if (hash_map == NULL)
+		exit(12);
+
+	if(tmp1 == NULL)
 		exit(12);
 
 	if (argc == 1) {
@@ -62,14 +66,24 @@ int main(int argc, char **argv)
 		for (i = 1; i < argc; i++)
 			if (verf_param(argv[i], i) == i) {
 				pch1 = strtok(argv[i+1], "=");
+				tmp1->name = NULL;
 				tmp1->name = 
 					(char *)malloc((strlen(pch1) + 1) * 
 					sizeof(char));
+
+				if (tmp1->name == NULL)
+					exit(12);
+
 				strcpy(tmp1->name, pch1);
 				pch1 = strtok(NULL, "=");
+				tmp1->value = NULL;
 				tmp1->value = 
 					(char *)malloc((strlen(pch1) + 1) * 
 					sizeof(char));
+
+				if (tmp1->value == NULL)
+					exit(12);
+
 				strcpy(tmp1->value, pch1);
 				hash_table_insert(hash_map, 
 					tmp1->name, 
@@ -92,6 +106,7 @@ int main(int argc, char **argv)
 	/*print_table(hash_map);*/
 	hash_table_delete(hash_map, TABLE_SIZE);
 	free(readInput);
+	hash_table_delete_object(tmp1);
 
 	return 0;
 }
