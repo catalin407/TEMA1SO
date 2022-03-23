@@ -1,6 +1,6 @@
 CFLAGS = /nologo
 
-all: so-cpp.exe
+build: so-cpp.exe
 
 so-cpp.exe: so-cpp.obj utilfunc.obj
 	link /nologo /out:$@ $**

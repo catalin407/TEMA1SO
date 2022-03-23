@@ -1,6 +1,6 @@
 #include "utilfunc.h"
 
-int verf_file_ext(char *str, int index) 
+int verf_file_ext(char *str, int index)
 {
 	char *ext;
 
@@ -15,13 +15,13 @@ int verf_file_ext(char *str, int index)
 			return index + 3;
 		else if (strcmp("subdir", ext + 1) == 0)
 			return index + 4;
-		else 
+		else
 			return index + 5;
 	} else
 		return -1;
 }
 
-int verf_param(char *str, int index) 
+int verf_param(char *str, int index)
 {
 	char *flag;
 
@@ -91,16 +91,17 @@ void add_define_hash(char *str, hashmap **hash_table, FILE **f)
 	char *del_str;
 	hashmap tmp;
 	int i;
-	int j;
 	int code;
-
+	FILE *fInclude;
+	
+	fInclude = NULL;
 	code = 1;
 
-	if (strstr(str, "#define ") == NULL && strcmp(str, "\n") != 0 && strstr(str, "#undef ") == NULL) {
+	if (strstr(str, "#define ") == NULL && strcmp(str, "\n") != 0 && strstr(str, "#undef ") == NULL && strstr(str, "#include") == NULL) {
 		for (i = 0; i < TABLE_SIZE; i++) {
 			if (hash_table[i] != NULL)
 				if (strstr(str, hash_table[i]->name) != NULL) {
-					str_tmp = replaceWord(str, 
+					str_tmp = replaceWord(str,
 						hash_table[i]->name,
 						hash_table[i]->value);
 					code = 0;
@@ -109,7 +110,7 @@ void add_define_hash(char *str, hashmap **hash_table, FILE **f)
 					for (i = 0; i < TABLE_SIZE; i++) {
 						if (hash_table[i] != NULL) {
 							if (strstr(str, hash_table[i]->name) != NULL) {
-								str_tmp = replaceWord(str, 
+								str_tmp = replaceWord(str,
 									hash_table[i]->name,
 									hash_table[i]->value);
 								code = 0;
@@ -121,8 +122,6 @@ void add_define_hash(char *str, hashmap **hash_table, FILE **f)
 						fprintf(stdout, "%s", str);
 					else if (strstr(str, "printf") != NULL && test_if_cond(str) == 0)
 						fprintf(stdout, "%s", str);
-					//else if (test_if_def(str, hash_table) == 0 && strstr(str, "#ifndef") == NULL && strstr(str, "#endif") == NULL)
-						//fprintf(stdout, "%s", str);
 				}
 		}
 
@@ -238,7 +237,7 @@ unsigned int hash(char *name)
 
 hashmap **init_hash_table(void)
 {
-	hashmap **hash_table_new = 
+	hashmap **hash_table_new =
 		(hashmap **)malloc(TABLE_SIZE * sizeof(hashmap *));
 	int i;
 
@@ -278,7 +277,7 @@ void hash_table_insert(hashmap **hash_table, char *name, char *value)
 
 	if (tmp != NULL) {
 		free(tmp->value);
-		tmp->value = 
+		tmp->value =
 			(char *)malloc(sizeof(char) * (strlen(value) + 1));
 		strcpy(tmp->value, value);
 		return;
@@ -294,11 +293,11 @@ void hash_table_insert(hashmap **hash_table, char *name, char *value)
 			try_hash = try_hash % TABLE_SIZE;
 	}
 
-	hash_table[try_hash] = 
+	hash_table[try_hash] =
 		(hashmap *)malloc(sizeof(hashmap));
-	hash_table[try_hash]->name = 
+	hash_table[try_hash]->name =
 		(char *)malloc(sizeof(char) * (strlen(name) + 1));
-	hash_table[try_hash]->value = 
+	hash_table[try_hash]->value =
 		(char *)malloc(sizeof(char) * (strlen(value) + 1));
 
 	strcpy(hash_table[try_hash]->name, name);
@@ -331,11 +330,7 @@ void hash_table_delete(hashmap **hash_table, int table_size)
 	if (hash_table) {
 		for (i = 0; i < TABLE_SIZE; i++)
 			if (hash_table[i] != NULL) {
-				free(hash_table[i]->name);
-				free(hash_table[i]->value);
-				hash_table[i]->name = NULL;
-				hash_table[i]->value = NULL;
-				free(hash_table[i]);
+				hash_table_delete_object(hash_table[i]);
 				hash_table[i] = NULL;
 			}
 	}
@@ -347,14 +342,10 @@ void *hash_table_delete_define(hashmap **hash_table, char *name)
 
 	if (hash_table) {
 		for (i = 0; i < TABLE_SIZE; i++)
-			if (hash_table[i] != NULL && 
-				hash_table[i]->name != NULL) 
+			if (hash_table[i] != NULL &&
+				hash_table[i]->name != NULL)
 				if (strcmp(hash_table[i]->name, name) == 0) {
-					free(hash_table[i]->name);
-					free(hash_table[i]->value);
-					hash_table[i]->name = NULL;
-					hash_table[i]->value = NULL;
-					free(hash_table[i]);
+					hash_table_delete_object(hash_table[i]);
 					hash_table[i] = NULL;
 				}
 	}
