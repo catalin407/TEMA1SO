@@ -117,19 +117,19 @@ void add_define_hash(char *str, hashmap **hash_table, FILE **f)
 							}
 						}
 					}
-					if(test_if_cond(str, hash_table) == 0 && strstr(str, "#if") == NULL && strstr(str, "#endif") == NULL && strstr(str, "#else") == NULL && strstr(str, "#elif") == NULL)
+					if(test_if_cond(str) == 0 && strstr(str, "#if") == NULL && strstr(str, "#endif") == NULL && strstr(str, "#else") == NULL && strstr(str, "#elif") == NULL)
 						fprintf(stdout, "%s", str);
-					else if (strstr(str, "printf") != NULL && test_if_cond(str, hash_table) == 0)
+					else if (strstr(str, "printf") != NULL && test_if_cond(str) == 0)
 						fprintf(stdout, "%s", str);
-					else if (test_if_def(str, hash_table) == 0 && strstr(str, "#ifndef") == NULL && strstr(str, "#endif") == NULL)
-						fprintf(stdout, "%s", str);
+					//else if (test_if_def(str, hash_table) == 0 && strstr(str, "#ifndef") == NULL && strstr(str, "#endif") == NULL)
+						//fprintf(stdout, "%s", str);
 				}
 		}
 
 		if (code == 1) {
-			if(test_if_cond(str, hash_table) == 0 && strstr(str, "#if") == NULL && strstr(str, "#endif") == NULL && strstr(str, "#else") == NULL && strstr(str, "#elif") == NULL)
+			if(test_if_cond(str) == 0 && strstr(str, "#if") == NULL && strstr(str, "#endif") == NULL && strstr(str, "#else") == NULL && strstr(str, "#elif") == NULL)
 				fprintf(stdout, "%s", str);
-			else if (strstr(str, "printf") != NULL && test_if_cond(str, hash_table) == 0)
+			else if (strstr(str, "printf") != NULL && test_if_cond(str) == 0)
 				fprintf(stdout, "%s", str);
 		}
 
